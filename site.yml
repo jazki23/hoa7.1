@@ -2,6 +2,21 @@
 - hosts: all
   become: true
   pre_tasks:
+
+  - name: Create directory
+    file:
+      path: /var/www/html
+      state: directory
+      mode: '0755'
+
+  - name: copy default html file for site
+    tags: apache, apache2, httpd
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
    
   - name: install updates (CentOS)
     dnf:
