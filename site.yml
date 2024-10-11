@@ -8,16 +8,16 @@
     dnf:
       update_only: yes
       update_cache: yes
-    when: ansible_distribution == "CentOS"
+    when: ansible_distribution is defined and ansible_distribution == "CentOS"
     
   - name: install updates (Ubuntu)
     tags: always
     apt:
       upgrade: dist
       update_cache: yes
-    when: ansible_distribution == "Ubuntu"
+    when: ansible_distribution is defined and ansible_distribution == "Ubuntu"
 
-- hosts: file_server
+- hosts: fileservers
   become: true
   tasks:
 
@@ -34,7 +34,7 @@
       owner: root
       group: root
 
-- hosts: servers, server_centOS
+- hosts: servers, db_server
   become: true
   tasks:
   
@@ -45,7 +45,7 @@
         - apache2
         - libapache2-mod-php
       state: latest
-    when: ansible_distribution == "Ubuntu"
+    when: ansible_distribution is defined and ansible_distribution == "Ubuntu"
     
   - name: install apache and php for CentOS servers
     tags: apache,centos,httpd
@@ -54,7 +54,7 @@
         - httpd
         - php
       state: latest
-    when: ansible_distribution == "CentOS"
+    when: ansible_distribution is defined and ansible_distribution == "CentOS"
 
   - name: copy default html file for site
     tags: apache, apache2, httpd
@@ -65,7 +65,7 @@
       group: root
       mode: 0644
    
-- hosts: server_centOS
+- hosts: db_server
   become: true
   tasks:
 
@@ -74,22 +74,22 @@
     yum:
       name: mariadb-server
       state: latest
-    when: ansible_distribution == "CentOS"
+    when: ansible_distribution is defined and ansible_distribution == "CentOS"
     
-  - name: Mariadb Restarting/Enabling
-    service:
-      name: mariadb
-      state: restarted
-      enabled: true
+  #- name: Mariadb Restarting/Enabling
+   # service:
+   #   name: mariadb
+   #   state: restarted
+   #   enabled: true
       
-  - name: install mariadb package (Ubuntu)
-    tags: db, mariadb,ubuntu
-    apt:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution == "Ubuntu"
+  #- name: install mariadb package (Ubuntu)
+  #  tags: db, mariadb,ubuntu
+  #  apt:
+  #    name: mariadb-server
+  #    state: latest
+  #  when: ansible_distribution is defined and ansible_distribution == "Ubuntu"
 
-- hosts: fileserver
+- hosts: fileservers
   become: true
   tasks:
   
